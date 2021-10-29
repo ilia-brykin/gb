@@ -1,0 +1,32 @@
+dir: my_project
+dirs:
+  - dir: settings
+    files:
+      - __init__.py
+      - dev.py
+      - prod.py
+  - dir: mainapp
+    files:
+      - __init__.py
+      - models.py
+      - views.py
+    dirs:
+      - dir: templates
+        dirs:
+          - dir: mainapp
+            files:
+              - base.html
+              - index.html
+  - dir: authapp
+    files:
+      - __init__.py
+      - models.py
+      - views.py
+      - templates
+    dirs:
+      - dir: templates
+        dirs:
+        - dir: authapp
+          files:
+            - base.html
+            - index.html

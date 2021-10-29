@@ -1,0 +1,24 @@
+[
+  {
+    "name": "my_project",
+    "children": [
+      "settings",
+      "mainapp",
+      "adminapp",
+      "authapp"
+    ]
+  },
+  "aloha",
+  {
+    "name": "test",
+    "children": [
+      {
+        "name": "test1",
+        "children": [
+          "test2",
+          "test3"
+        ]
+      }
+    ]
+  }
+]

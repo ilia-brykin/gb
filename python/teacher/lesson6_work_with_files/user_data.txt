@@ -1,0 +1,1 @@
+{'name': 'Basil', 'age': 27, 'education': ['MSU', 'HSE'], 'was_ill': False}
