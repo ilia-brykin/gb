@@ -716,53 +716,25 @@ INSERT INTO `profiles` VALUES
 ('99','f','1996-10-09','99','1981-09-24 02:19:44','Lake Lora'),
 ('100','f','1990-02-11','100','1974-08-23 15:31:47','Port Mable');
 
--- 1) Пусть задан некоторый пользователь. Из всех друзей этого пользователя найдите человека, который больше всех общался с нашим пользователем.
-
-SELECT from_user_id,
-       (select email from users where id = messages.from_user_id) as email,
-       COUNT(*) as count FROM messages
-WHERE to_user_id = 1 AND from_user_id IN (
-    SELECT target_user_id FROM friend_requests
-    WHERE initiator_user_id = 1 AND status = 'approved'
-    UNION
-    SELECT initiator_user_id FROM friend_requests
-    WHERE target_user_id = 1 AND status = 'approved'
-    )
-GROUP BY from_user_id
+-- 1) Пусть задан некоторый пользователь. Из всех друзей этого пользователя найдите человека,
+-- который больше всех общался с выбранным пользователем (написал ему сообщений).
+SELECT u.id, u.firstname, u.lastname, COUNT(*) as count from users u
+JOIN messages m on u.id = m.from_user_id
+JOIN friend_requests fr ON u.id = fr.initiator_user_id OR u.id = fr.target_user_id
+WHERE m.to_user_id = 1 AND (fr.initiator_user_id = 1 OR fr.target_user_id = 1) AND fr.status = 'approved'
+GROUP BY m.from_user_id
 ORDER BY count DESC
 LIMIT 1;
 
 -- 2) Подсчитать общее количество лайков, которые получили пользователи младше 10 лет.
-SELECT COUNT(*) as count FROM likes
-WHERE media_id IN (SELECT id FROM media
-    WHERE user_id IN (
-        SELECT user_id FROM profiles
-        WHERE TIMESTAMPDIFF(year, birthday, now()) < 10
-        )
-    );
-
-SELECT COUNT(*) as count FROM likes
-WHERE user_id IN (
-    SELECT user_id FROM profiles
-    WHERE TIMESTAMPDIFF(year, birthday, now()) < 10
-    );
+SELECT COUNT(*) as count FROM likes l
+JOIN media m ON l.media_id = m.id
+JOIN profiles p on m.user_id = p.user_id
+WHERE TIMESTAMPDIFF(year, p.birthday, now()) < 10;
 
 -- 3) Определить кто больше поставил лайков (всего): мужчины или женщины.
-
--- В этом запросе выводим и мужчин и женщин
-SELECT (SELECT gender FROM profiles
-       WHERE user_id = likes.user_id) as gender,
-       COUNT(*) as count
-       FROM likes
-GROUP BY gender
-ORDER BY count DESC;
-
--- В этом запросе проверяем кто больше поставил лайков
-
-SELECT (SELECT gender FROM profiles
-       WHERE user_id = likes.user_id) as gender,
-       COUNT(*) as count
-       FROM likes
-GROUP BY gender
+SELECT p.gender, COUNT(*) as count from likes l
+JOIN profiles p on l.user_id = p.user_id
+GROUP BY p.gender
 ORDER BY count DESC
 LIMIT 1;
