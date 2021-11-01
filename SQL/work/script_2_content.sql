@@ -1,265 +1,4 @@
-DROP DATABASE IF EXISTS slogonator;
-CREATE DATABASE slogonator;
 USE slogonator;
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_user_statuses;
-CREATE TABLE c_user_statuses(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(100) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_genders;
-CREATE TABLE c_genders(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(20) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-    id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    firstname VARCHAR(100) NOT NULL,
-    lastname VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash varchar(100),
-    user_status_id BINARY(16),
-
-    FOREIGN KEY (user_status_id) REFERENCES c_user_statuses(id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS profiles;
-CREATE TABLE profiles (
-	user_id BINARY(16) PRIMARY KEY,
-    gender_id BINARY(16),
-    birthday DATE,
-    phone VARCHAR(50),
-    hometown VARCHAR(100),
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (gender_id) REFERENCES c_genders(id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS roles;
-CREATE TABLE roles(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS permissions;
-CREATE TABLE permissions(
-    `key` VARCHAR(50) PRIMARY KEY,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS roles_permissions;
-CREATE TABLE roles_permissions(
-	role_id BINARY(16) NOT NULL,
-	permission_key VARCHAR(50) NOT NULL,
-
-	PRIMARY KEY (role_id, permission_key),
-    FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (permission_key) REFERENCES permissions(`key`) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS users_roles;
-CREATE TABLE users_roles(
-	user_id BINARY(16) NOT NULL,
-	role_id BINARY(16) NOT NULL,
-
-	PRIMARY KEY (user_id, role_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_notification_types;
-CREATE TABLE c_notification_types(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS notifications;
-CREATE TABLE notifications(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	notification_type_id BINARY(16),
-	user_id BINARY(16) NOT NULL,
-	header VARCHAR(100) NOT NULL,
-	body TEXT NOT NULL,
-	additional_information JSON,
-	is_read bit default 0,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (notification_type_id) REFERENCES c_notification_types(id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS levels;
-CREATE TABLE levels(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	number MEDIUMINT UNSIGNED NOT NULL UNIQUE,
-    description VARCHAR(255),
-    money_after_passing MEDIUMINT UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS words;
-CREATE TABLE words(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	level_id BINARY(16),
-	word VARCHAR(30) NOT NULL,
-    description VARCHAR(255),
-    image_preview VARCHAR(255) NOT NULL,
-    image_big VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (level_id) REFERENCES levels(id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS syllables;
-CREATE TABLE syllables(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	word_id BINARY(16),
-	syllable VARCHAR(8) NOT NULL,
-	number TINYINT NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (word_id) REFERENCES words(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS progress;
-CREATE TABLE progress(
-    id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	user_id BINARY(16) NOT NULL,
-	level_id BINARY(16),
-	points BIGINT UNSIGNED NOT NULL,
-	money BIGINT UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (level_id) REFERENCES levels(id) ON UPDATE CASCADE ON DELETE SET NULL
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_progress_words_statuses;
-CREATE TABLE c_progress_words_statuses(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-DROP TABLE IF EXISTS progress_level_words;
-CREATE TABLE progress_level_words(
-    id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-	progress_level_id BINARY(16) NOT NULL,
-	word_id BINARY(16) NOT NULL,
-	status_id BINARY(16),
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (progress_level_id) REFERENCES progress(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (status_id) REFERENCES c_progress_words_statuses(id) ON UPDATE CASCADE ON DELETE SET NULL,
-    FOREIGN KEY (word_id) REFERENCES words(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_hints;
-CREATE TABLE c_hints(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    price MEDIUMINT UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS user_hints;
-CREATE TABLE user_hints(
-	user_id BINARY(16) NOT NULL,
-	hint_id BINARY(16) NOT NULL,
-	count INT UNSIGNED NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (user_id, hint_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (hint_id) REFERENCES c_hints(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS c_friend_requests_statuses;
-CREATE TABLE c_friend_requests_statuses(
-	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS friend_requests;
-CREATE TABLE friend_requests (
-	initiator_user_id BINARY(16) NOT NULL,
-    target_user_id BINARY(16) NOT NULL,
-    status_id BINARY(16) NOT NULL,
-	created_at DATETIME DEFAULT NOW(),
-	updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (initiator_user_id, target_user_id),
-    FOREIGN KEY (initiator_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (target_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (status_id) REFERENCES c_friend_requests_statuses(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
--- Таблица заполнена
-DROP TABLE IF EXISTS messages;
-CREATE TABLE messages (
-	id BINARY(16) PRIMARY KEY,
-	from_user_id BINARY(16) NOT NULL,
-    to_user_id BINARY(16) NOT NULL,
-    header VARCHAR(100) NOT NULL,
-    body TEXT NOT NULL,
-    is_read bit default 0,
-    created_at DATETIME DEFAULT NOW(),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (from_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (to_user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
 -- INSERT
 INSERT INTO c_user_statuses
     (id, name, description)
@@ -635,7 +374,7 @@ VALUE
 
 INSERT INTO notifications
     (notification_type_id, user_id, header, body, additional_information, created_at, updated_at)
-VALUES 
+VALUES
     (UUID_TO_BIN('03dfa488-fa98-4a1b-91bf-ff0eeabd7799'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Alice said; but was dreadfully puzzled by the officers of the evening, beautiful Soup! Soup of the m','Sint neque aliquid nulla voluptatum qui et voluptate. Possimus aperiam doloremque libero non. Rerum delectus provident aut qui eaque exercitationem maxime deleniti. In ut non aliquam. Fuga rerum ut accusantium voluptatem doloremque cum.',NULL,'2015-12-08 16:23:53','2000-09-15 21:23:16'),
     (UUID_TO_BIN('2c1a558e-d6e4-43d4-a08f-daea622c3af5'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'But they HAVE their tails fast in their mouths; and the March Hare. \'Sixteenth,\' added the March Har','Fugiat laudantium cupiditate sint et modi dolores nihil. Est nihil voluptatem possimus nihil dolores. Quisquam qui repellat nihil velit. Accusantium qui voluptas quibusdam consequuntur sapiente dignissimos nesciunt reprehenderit.',NULL,'2005-12-10 23:11:20','1998-12-03 01:11:08'),
     (UUID_TO_BIN('03dfa488-fa98-4a1b-91bf-ff0eeabd7799'),UUID_TO_BIN('df4f400f-3431-11ec-a045-d43b0469c611'),'I said \"What for?\"\' \'She boxed the Queen\'s voice in the distance, and she went on, turning to the Qu','Et repellendus consequatur ea qui ea expedita tempore. Ex sequi repudiandae ut maxime deserunt cumque. Qui voluptas eos ipsum.',NULL,'1989-11-07 05:35:03','1995-09-30 03:32:27'),
@@ -985,12 +724,63 @@ VALUES
     (UUID_TO_BIN('51d59f7a-adbb-3bd1-bb5e-2918a6cddde6'),'от',1,'1996-07-08 01:30:36','2010-03-04 11:18:02'),
     (UUID_TO_BIN('51d59f7a-adbb-3bd1-bb5e-2918a6cddde6'),'ец',2,'1976-11-02 03:47:07','1993-01-02 16:54:13');
 
+INSERT INTO progress
+    (id, user_id, level_id, points, money, created_at, updated_at)
+VALUE
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),8933,86,'1999-12-27 10:11:06','1992-10-08 14:46:06'),
+    (UUID_TO_BIN('0da6eca8-6ab4-3dc8-b779-0507092c1981'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),8266,676,'2001-04-04 05:20:41','1976-12-01 22:53:57'),
+    (UUID_TO_BIN('1449596a-2806-397c-9265-fc800999182c'),UUID_TO_BIN('df4f35b3-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0e0e005d-782d-3f44-a193-2f9939cfb299'),4313,142,'2007-08-15 10:54:06','2013-02-01 09:12:54'),
+    (UUID_TO_BIN('17128397-d960-36fd-a5ca-f56e8aba47c9'),UUID_TO_BIN('df4f3a14-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('12aad9ce-2d5d-39e1-82dd-71cf070da19a'),349,550,'1972-03-17 18:11:15','2011-04-17 17:15:40'),
+    (UUID_TO_BIN('25a532a0-f9dd-3c17-b1bb-a77dea12ba0b'),UUID_TO_BIN('df4f3c32-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('13114d64-64fa-3233-be30-f868ff56d62d'),8871,115,'1976-11-01 14:32:26','1995-12-09 11:25:49'),
+    (UUID_TO_BIN('2cfb6719-8ab8-3be6-a87f-9f31ec0fe142'),UUID_TO_BIN('df4f400f-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1384c326-f501-3f09-89ad-e787b87abae1'),1033,671,'1983-09-27 22:27:52','1970-09-29 13:41:08'),
+    (UUID_TO_BIN('33f8966f-9bd2-3d05-9b0a-a65f1fe0acbb'),UUID_TO_BIN('df4f4386-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('17b310a2-f96e-3de8-8b2c-51215c81b791'),6555,303,'1995-02-21 12:24:17','1971-12-29 03:26:05'),
+    (UUID_TO_BIN('605e6521-076e-30d3-b30a-09482e8a237c'),UUID_TO_BIN('df4f44a6-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1b1942d9-03e7-326c-a61b-bdc7143eb7d5'),6436,677,'2015-12-11 09:06:05','2014-08-15 07:53:32'),
+    (UUID_TO_BIN('6d90408d-cebf-3150-b514-9e2e0c2c5898'),UUID_TO_BIN('df4f45bc-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),2370,647,'1983-07-12 20:13:58','1990-06-21 08:42:18'),
+    (UUID_TO_BIN('73fb9149-9720-371c-ac95-390d61202703'),UUID_TO_BIN('df4f4922-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),8438,977,'1982-07-09 05:28:24','1983-01-15 07:56:37'),
+    (UUID_TO_BIN('876e053b-f664-37ca-9087-e0d1731b1f0a'),UUID_TO_BIN('df4f4c69-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),3782,927,'1987-09-11 01:56:53','1993-07-12 03:27:58'),
+    (UUID_TO_BIN('93a76dcc-cee3-3bf3-8416-2227734a385b'),UUID_TO_BIN('df4f4fbe-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),4154,969,'1997-04-08 07:46:04','1977-07-14 10:19:29'),
+    (UUID_TO_BIN('995fee0d-f727-30a4-8d6d-47ddd82dbffe'),UUID_TO_BIN('df4f504d-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),428,411,'1992-01-19 01:40:23','2005-03-23 20:43:14'),
+    (UUID_TO_BIN('a2532f17-a4ca-3961-9007-ac9d1f4584f6'),UUID_TO_BIN('df4f5316-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),9632,185,'2017-07-27 16:12:09','2006-04-03 01:41:12'),
+    (UUID_TO_BIN('ac128ead-e3ab-3fda-8c52-36853f1051ad'),UUID_TO_BIN('df4f5430-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),8508,710,'1989-07-02 12:37:02','1983-07-09 22:46:28'),
+    (UUID_TO_BIN('ac8d3312-5661-30b6-b1b7-d6cb9d278941'),UUID_TO_BIN('df4f566d-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),3747,326,'1991-06-16 00:25:23','2015-10-28 22:39:41'),
+    (UUID_TO_BIN('b5149553-ae63-30bd-a277-a329d62dde98'),UUID_TO_BIN('df4f59c9-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),2006,411,'2018-08-29 18:51:17','1999-05-17 13:33:54'),
+    (UUID_TO_BIN('ba14c49c-ea16-3071-9817-f2b5d26e065b'),UUID_TO_BIN('df4f5a55-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),608,601,'2013-11-16 08:25:06','1985-10-09 15:31:16'),
+    (UUID_TO_BIN('c420389e-677c-3513-91be-c666f888c7c9'),UUID_TO_BIN('df4f5ae7-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),4170,128,'2012-03-23 20:57:36','1995-03-26 14:07:53'),
+    (UUID_TO_BIN('c463e660-0d9f-3310-a9e1-a78e260132b1'),UUID_TO_BIN('df4f5d68-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),853,502,'1994-05-13 05:45:32','2000-10-22 19:51:29'),
+    (UUID_TO_BIN('c50cd74a-3d05-3de5-aee1-39c19897fc27'),UUID_TO_BIN('df4f5f22-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),9139,431,'1971-01-18 04:57:13','1997-05-02 07:16:39'),
+    (UUID_TO_BIN('cb620baf-f4bf-304c-9099-e5e9194e0f05'),UUID_TO_BIN('df4f627a-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),183,820,'1972-10-25 18:15:14','2016-04-15 16:27:17'),
+    (UUID_TO_BIN('d29aefe2-880b-3ebb-8437-c1c3dbfbdfaa'),UUID_TO_BIN('df4f630a-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),8785,483,'1976-08-25 22:41:48','2017-11-21 17:34:07'),
+    (UUID_TO_BIN('de7ed681-2ec9-37d3-9a7c-b96b504bc0bb'),UUID_TO_BIN('df4f64b3-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),6061,428,'1989-12-21 01:08:25','1986-10-17 05:55:31'),
+    (UUID_TO_BIN('e5b6f2e4-2e5a-3e76-9e50-45caeb4261ad'),UUID_TO_BIN('df4f65d3-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),8634,197,'2007-06-30 03:50:44','1981-01-08 18:38:44'),
+    (UUID_TO_BIN('e735d2ed-351f-3d32-83ed-2b8d0cded5a2'),UUID_TO_BIN('df4f6811-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),7382,83,'1978-06-12 21:35:07','1977-11-03 01:00:31'),
+    (UUID_TO_BIN('ea027e87-31ba-3aae-97a5-28c0127847f1'),UUID_TO_BIN('df4f692f-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('0a9ab2da-30f8-3dde-8f97-4aa571631f4a'),7948,501,'2009-08-30 03:17:09','1974-04-18 13:31:43'),
+    (UUID_TO_BIN('eb782c93-b9c9-3ff5-af69-9b64f13d5bf3'),UUID_TO_BIN('df4f6b63-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),9988,737,'1985-02-09 06:28:07','1978-06-30 20:16:37'),
+    (UUID_TO_BIN('fa165672-1680-30b5-b9d9-fd8e9654f61d'),UUID_TO_BIN('df4f6d0a-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('089bf7b8-936e-358c-87c0-ea3cb0afa1f0'),8789,972,'1995-11-18 09:43:24','1970-06-02 11:42:35'),
+    (UUID_TO_BIN('fc22f218-e7d7-3703-b1a7-c4c748b384f4'),UUID_TO_BIN('df4f3528-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('1df54689-aa00-343d-96c7-117021e42092'),9542,159,'1996-10-10 16:24:56','1991-03-10 20:22:14');
+
+
 INSERT INTO c_progress_words_statuses
     (id, name, description)
 VALUE
-    (UUID_TO_BIN('14bacfcb-1a61-4f8e-a324-7388adab80cb'), 'selected', 'Слово выбрано для текущего пользователя и уровня'),
     (UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'), 'visible', 'Слово видимо для текущего пользователя и уровня в данный момент'),
     (UUID_TO_BIN('d2d21e24-dc26-4a70-a142-397c06bec6e0'), 'used', 'Слово отгадано');
+
+INSERT INTO progress_level_words
+    (progress_id, word_id, status_id, created_at, updated_at)
+VALUE
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('08a4aaf9-5df8-3a82-bc02-6929e4d52872'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('099c8bd8-65ce-362c-8e2a-271076f6347f'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('0afd013d-f29c-34e2-aba1-d842eef6da59'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('0c5c6147-8e0d-3589-a786-445f67ea4d72'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('0eae6918-bd66-3185-8f06-f5a85fc8fa69'),UUID_TO_BIN('d2d21e24-dc26-4a70-a142-397c06bec6e0'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('0efeed09-50e9-3b89-9af9-fb08efb95bcf'),UUID_TO_BIN('d2d21e24-dc26-4a70-a142-397c06bec6e0'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('04e42e1d-cd8b-360f-9616-d00e93ea2426'),UUID_TO_BIN('0f3c4f4e-eabb-334c-97f4-1757fdde8658'),UUID_TO_BIN('d2d21e24-dc26-4a70-a142-397c06bec6e0'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+
+    (UUID_TO_BIN('0da6eca8-6ab4-3dc8-b779-0507092c1981'),UUID_TO_BIN('0f3c4f4e-eabb-334c-97f4-1757fdde8658'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('0da6eca8-6ab4-3dc8-b779-0507092c1981'),UUID_TO_BIN('0f63e2a4-c8c2-3f76-90b0-77762f5a884e'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('0da6eca8-6ab4-3dc8-b779-0507092c1981'),UUID_TO_BIN('109c98b0-0753-39a9-bfc6-40e654588021'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08'),
+    (UUID_TO_BIN('0da6eca8-6ab4-3dc8-b779-0507092c1981'),UUID_TO_BIN('1725b469-8942-35f3-9edc-236ebf641a14'),UUID_TO_BIN('49b99e4a-fea8-47d3-ba28-e994d9d5b957'),'2005-11-28 22:22:56','1996-09-04 20:28:08');
+
 
 INSERT INTO c_hints
     (id, name, description, price)
@@ -998,10 +788,10 @@ VALUE
     (UUID_TO_BIN('b92cdb17-381d-4abf-b731-da2090e2b4bd'),'first_syllable','Первый слог',50),
     (UUID_TO_BIN('78c0dab3-ec6e-4c22-a6c8-fb6c56de5aac'),'skip_picture','Пропустить картинку',100),
     (UUID_TO_BIN('7bb03243-85db-47a4-baa2-c7827d0e3142'),'change_all_pictures','Поменять все картинки',200);
-    
-INSERT INTO user_hints 
+
+INSERT INTO user_hints
     (user_id, hint_id, count, created_at, updated_at)
-VALUES 
+VALUES
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('b92cdb17-381d-4abf-b731-da2090e2b4bd'),48914,'2005-11-28 22:22:56','1996-09-04 20:28:08'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('78c0dab3-ec6e-4c22-a6c8-fb6c56de5aac'),999,'1986-09-13 22:22:43','1989-06-29 18:42:47'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('7bb03243-85db-47a4-baa2-c7827d0e3142'),678,'1982-11-18 15:22:09','2017-08-27 09:57:28'),
@@ -1093,8 +883,8 @@ VALUE
 
 INSERT INTO friend_requests
     (initiator_user_id, target_user_id, status_id, created_at, updated_at)
-VALUES 
-    (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('7f02db54-d2a7-4c4c-9420-17ffec51265d'),'1989-02-12 08:53:51','1988-08-19 10:57:18'),
+VALUES
+    (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('5a3109b8-aae7-46fd-b522-71a9c3dba21f'),'1989-02-12 08:53:51','1988-08-19 10:57:18'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f3a14-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('5a3109b8-aae7-46fd-b522-71a9c3dba21f'),'2013-05-16 01:43:28','2020-10-15 11:51:29'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f3c32-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('7f02db54-d2a7-4c4c-9420-17ffec51265d'),'1989-12-19 20:00:01','1972-05-25 04:20:16'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f400f-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('19a28401-7799-42d1-bb5f-e9762295ccc3'),'1991-04-28 08:04:45','1987-10-10 16:32:10'),
@@ -1124,17 +914,17 @@ VALUES
 
 INSERT INTO messages
     (from_user_id, to_user_id, header, body, created_at, updated_at)
-VALUES 
+VALUES
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Laudantium voluptas et perspiciatis aliquam. Quam minima ducimus sunt et et perferendis officia. Vel','Et odio vitae fugit saepe voluptates amet omnis quis. Voluptas eos omnis explicabo aperiam aut fugiat iure sapiente. Modi beatae ut nobis eveniet facilis et placeat.','2013-04-22 12:38:45','1989-05-28 01:43:53'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Nostrum nostrum impedit occaecati libero. Autem est vel voluptate porro eligendi sed. Consequatur et','Saepe consequatur nobis exercitationem quae suscipit debitis. Odit unde dolor necessitatibus blanditiis. Voluptates culpa aut voluptas quas. Dolorem quod nobis sit dolore debitis dicta.','1972-07-05 06:01:47','1970-01-07 17:53:27'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Ut id ab quia sequi nemo illo. Ut consectetur voluptatem rerum. Adipisci vitae est quo ut alias inci','Earum illum voluptatibus sed quis odio. Ex qui ut iste placeat. Et animi maiores voluptatem tempore voluptatibus nihil. Molestiae et qui nulla tempora.','2006-10-01 14:18:56','1990-11-13 06:09:37'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Molestiae sunt dolores non sed vel soluta. Voluptatem aut rerum at ducimus. Distinctio voluptas ut u','A numquam ut ad est. Voluptas quia aut quasi ut modi quisquam. Ea ratione explicabo earum quod dolorum inventore. Non ipsam quis quis. Praesentium nostrum eum aut et sunt deleniti ut.','1985-01-29 13:34:06','1975-01-30 06:23:18'),
     (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Sit cum quod totam dolorem. Hic quos commodi illum ullam aut. Voluptatum porro voluptatem vel tempor','Accusantium ea minima ratione aspernatur exercitationem. Molestias pariatur temporibus ipsum nulla. Dolore atque iusto ut nemo.','1996-08-21 18:53:59','1985-01-23 04:31:47'),
-    (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Deserunt quis qui est sed beatae voluptates voluptatibus. Ad tempore deleniti rerum laboriosam labor','Accusamus a qui esse ut. Quidem quos itaque qui exercitationem officia quia molestias. Dolorem facilis sit id nihil. Ipsam id magnam occaecati cum nemo nemo ut.','1977-04-20 09:44:02','2013-04-18 05:24:32'),
+    (UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Deserunt quis qui est sed beatae voluptates voluptatibus. Ad tempore deleniti rerum laboriosam labor','Accusamus a qui esse ut. Quidem quos itaque qui exercitationem officia quia molestias. Dolorem facilis sit id nihil. Ipsam id magnam occaecati cum nemo nemo ut.','1977-04-20 09:44:02','2013-04-18 05:24:32'),
     (UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Provident consequatur quibusdam sed nesciunt numquam tempore rerum. Neque voluptates qui est tempore','Facilis quod delectus non quibusdam. Libero unde maiores aspernatur officia ab eum non. Atque quia error accusantium et voluptatem.','2000-10-08 16:02:04','1979-11-05 16:32:52'),
-    (UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f566d-3431-11ec-a045-d43b0469c611'),'Voluptatibus enim saepe ut voluptatibus. Sed esse et incidunt omnis. Earum perferendis quam explicab','Quasi qui incidunt delectus molestias. Et quasi ad sed et laboriosam atque quas.','2009-07-26 15:10:25','1971-05-16 08:08:15'),
+    (UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),'Voluptatibus enim saepe ut voluptatibus. Sed esse et incidunt omnis. Earum perferendis quam explicab','Quasi qui incidunt delectus molestias. Et quasi ad sed et laboriosam atque quas.','2009-07-26 15:10:25','1971-05-16 08:08:15'),
     (UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Iusto recusandae expedita doloribus repellendus quam quo perspiciatis laudantium. Minima facilis lab','Enim nobis eum suscipit est et. Et dolores non saepe dolorem atque. Mollitia enim nihil cumque voluptatem nostrum. Nam id harum molestiae. Suscipit sit culpa porro provident porro ex est.','2021-06-19 20:00:28','2015-03-20 00:54:56'),
-    (UUID_TO_BIN('df4f4386-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f59c9-3431-11ec-a045-d43b0469c611'),'Consequatur earum adipisci in nobis laboriosam tempora. Reprehenderit voluptates repellendus corrupt','Porro animi architecto consequatur dolor quis officia voluptatem soluta. Molestias modi tempore quisquam rerum consequatur quo voluptatum natus. Suscipit ad ut nihil voluptatem possimus ratione dolor.','2008-03-06 02:22:29','2017-08-05 18:28:54'),
+    (UUID_TO_BIN('df4f33f1-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f59c9-3431-11ec-a045-d43b0469c611'),'Consequatur earum adipisci in nobis laboriosam tempora. Reprehenderit voluptates repellendus corrupt','Porro animi architecto consequatur dolor quis officia voluptatem soluta. Molestias modi tempore quisquam rerum consequatur quo voluptatum natus. Suscipit ad ut nihil voluptatem possimus ratione dolor.','2008-03-06 02:22:29','2017-08-05 18:28:54'),
     (UUID_TO_BIN('df4f44a6-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f5a55-3431-11ec-a045-d43b0469c611'),'Quod minima incidunt in cumque cumque rem sapiente eos. Fugit molestias deserunt aut asperiores. Ver','Molestiae quis praesentium non qui nihil ut. Et et at iste occaecati. Explicabo et exercitationem quaerat aut.','2014-05-11 11:32:52','2002-02-03 06:43:11'),
     (UUID_TO_BIN('df4f45bc-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Dolores ea nostrum non illum eveniet est. Labore optio sint dolore ea nulla voluptate impedit. Sint ','Illum veritatis consequatur sint dolor. Autem sit sint odio qui voluptatem quo. Enim nihil et consequatur minus eveniet incidunt.','1990-01-24 23:47:14','2001-03-17 18:56:16'),
     (UUID_TO_BIN('df4f4922-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f5ae7-3431-11ec-a045-d43b0469c611'),'Doloribus et tempora in voluptate necessitatibus. Eveniet animi commodi laboriosam amet perspiciatis','Molestiae sunt dicta aut ducimus tempora delectus. Sed consequatur labore enim veritatis alias sapiente.','2012-02-09 08:55:04','2016-03-15 00:41:27'),
@@ -1143,25 +933,3 @@ VALUES
     (UUID_TO_BIN('df4f504d-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Voluptates autem at quam modi. Esse qui minima laboriosam quam et voluptatibus. Impedit explicabo la','At sit sed molestias consequatur. Aut vitae vel repellat cum cumque labore vel.','2017-05-31 00:55:03','1980-04-20 09:08:32'),
     (UUID_TO_BIN('df4f5316-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f627a-3431-11ec-a045-d43b0469c611'),'Dolor modi voluptatibus provident magnam ut temporibus. Quia voluptatem ex ducimus dolores. Qui duci','Aliquid sit eius pariatur repellendus deserunt soluta. Nulla deserunt maxime quis sit inventore nihil aut expedita.','2015-08-21 23:08:05','1988-10-05 17:24:26'),
     (UUID_TO_BIN('df4f5430-3431-11ec-a045-d43b0469c611'),UUID_TO_BIN('df4f30cb-3431-11ec-a045-d43b0469c611'),'Dolorem natus excepturi accusantium a sit mollitia. Aut doloribus magni ullam inventore cum. In et n','Sed fugit aliquid nemo fuga quasi ut et. Minus ab id sit quod. Quidem amet deleniti suscipit quae ut ratione accusantium. Atque enim dolorum quaerat illo suscipit. Nesciunt tempore molestias nihil id odit.','1993-09-06 20:12:48','2020-11-13 13:14:58');
-
-
-
-
-
--- INSERT INTO users
---     (firstname, lastname, email, password_hash)
--- VALUE
---     ('Admin', 'Admin', 'admin1@example.com', '8798879');
-
--- select BIN_TO_UUID(id) as id from users;
-
--- delete from users;
-
--- SELECT REPLACE(CAST(UUID() as char character set latin1), '-', ''), REPLACE(CAST(UUID() as char character set utf8), '-', '');
-
--- id SERIAL PRIMARY KEY, -- SERIAL = BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE
-
--- INSERT INTO users
---     (id, firstname)
--- VALUES (UUID(), 'aloha'),
---        (UUID(), 'hola');
