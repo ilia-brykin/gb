@@ -45,10 +45,14 @@ SELECT BIN_TO_UUID(w.id) AS word_id, w.image_preview, w.image_big, w.description
 JOIN progress_level_words plw on p.id = plw.progress_id
 JOIN words w on plw.word_id = w.id
 JOIN c_progress_words_statuses cpws on plw.status_id = cpws.id
-WHERE user_id = @admin_uuid_bin AND cpws.name = 'visible';
+WHERE p.user_id = @admin_uuid_bin AND cpws.name = 'visible';
 
 -- Найти всех друзей для текущего пользователя UUID 'df4f30cb-3431-11ec-a045-d43b0469c611'
-SELECT BIN_TO_UUID(u.id) AS user_id, u.firstname, u.lastname FROM users u
+SELECT vf.id, vf.firstname, vf.lastname FROM v_friends vf
+WHERE (vf.initiator_user_id = @admin_uuid OR vf.target_user_id = @admin_uuid) AND vf.id != @admin_uuid;
+
+-- тоже самое без VIEW
+SELECT BIN_TO_UUID(u.id) AS id, u.firstname, u.lastname FROM users u
 JOIN friend_requests fr ON u.id = fr.initiator_user_id OR u.id = fr.target_user_id
 JOIN c_friend_requests_statuses cfrs on fr.status_id = cfrs.id
 WHERE (fr.initiator_user_id = @admin_uuid_bin
@@ -70,34 +74,3 @@ LIMIT 1;
 -- Найти количество сообщений, которые отправлены текущему пользователю
 SELECT COUNT(*) as count from messages
 WHERE to_user_id = @admin_uuid_bin;
-
--- procedures
-DELIMITER //
-
--- Найти текущий уровень для определенного пользователя
-DROP PROCEDURE IF EXISTS current_level_for_user//
-CREATE PROCEDURE current_level_for_user(IN user_uuid VARCHAR(36), OUT level INT)
-BEGIN
-    SELECT l.number INTO level FROM progress p
-    JOIN levels l on p.level_id = l.id
-    WHERE p.user_id = UUID_TO_BIN(user_uuid);
-END//
-CALL current_level_for_user(@admin_uuid, @level_number)//
-SELECT @level_number//
-
--- Найти сообщения для определенного пользователя: все(2-9), прочитанные(1) или непрочитанные(0)
-DELIMITER //
-DROP PROCEDURE IF EXISTS get_messages_for_user//
-CREATE PROCEDURE get_messages_for_user(IN user_uuid VARCHAR(36), IN is_read_local INT(1))
-BEGIN
-    IF is_read_local = 1 OR is_read_local = 0 THEN
-        SELECT * FROM messages
-        WHERE to_user_id = UUID_TO_BIN(user_uuid) AND is_read = is_read_local;
-    ELSE
-        SELECT * FROM messages
-        WHERE to_user_id = UUID_TO_BIN(user_uuid);
-    END IF;
-END//
-CALL get_messages_for_user(@admin_uuid, 0)//
-
-DELIMITER ;
