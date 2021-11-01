@@ -1,0 +1,2 @@
+makeMenu("index");
+makeFooter();

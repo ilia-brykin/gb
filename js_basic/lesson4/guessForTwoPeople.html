@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Личный сайт студента GeekBrains</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="js/global.js"></script>
+</head>
+<body>
+<div class="contentWrap">
+	<div class="content">
+		<div class="center">
+			<h1>Игра угадайка для двух игроков</h1>
+
+			<div class="box" id="players">
+				<label for="userName1">Имя первого игрока</label>
+				<input type="text" id="userName1">
+				<br>
+				<label for="userName2">Имя второго игрока</label>
+				<input type="text" id="userName2">
+				<br>
+				<button class="btn" onClick="start();">Начать</button>
+			</div>
+
+			<div class="box" id="game" style="display: none;">
+				<p id="info">Угадайте число от 0 до 100</p>
+				<p id="info_box">Ход игрока номер <span id="player_info">1</span></p>
+				<input type="text" id="userAnswer" oninput="changeAnswer(this)">
+				<button id="button2" class="btn" onClick="guess();">Угадывать</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="js/guessForTwoPeople.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title>Основы программирования. Интерактивный курс.</title>
+        <script>
+            function ganerateText(lett,length){
+                var text = "";
+                for(var i=0; i<length; i++){
+                    var n = getRandomNumber(lett.length - 1);
+                    text = text + lett[n];
+                }
+                return text;
+                }
+
+                function getRandomNumber(max) {
+                    return Math.round(Math.random() * max); 
+                }
+            alert("Вас приветствует программа по обучению слепой печати");
+            function check(lett){
+                alert("Поставьте мизинец левой руки на букву Ф, безымянный палец — на Ы, средний — на В, указательный — на А. Мизинец правой руки на букву Ж, безымянный палец — на Д, средний -— на Л, указательный — на О. Запомните расположение пальцев.");
+                var text = ganerateText(lett,10);
+                var userText = prompt(text);
+                if(userText == text){
+                    alert("Все верно!\nПереходим на следующий уровень!");
+                    return true;} else {alert("Вы ошиблись. Попробуйте еще раз.");
+                }
+            }
+            while(true) {
+                var lett=["ф","а"];
+                if (check(lett)==true){
+                    lett=["ы","в"];
+                if (check(lett)==true) {
+                    lett=["о","ж"];
+                if (check(lett)==true){
+                    lett=["л","д"];
+                }}}}
+            
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
+

@@ -1,0 +1,74 @@
+// a. Написать функцию, которая принимает в качестве параметра число n. Результатом работы функции является массив из N элементов со значениями 1, 2, 3… n.
+b. Написать функцию, которая принимает массив чисел. Результатом работы функции является сумма чисел этого массива.
+c. Написать функцию, которая на вход получает массив целых чисел, и в качестве результата возвращает максимальное число.
+d. Написать функцию, которая на вход получает массив целых чисел, и в качестве результата возвращает минимальное число.
+f. Написать функцию, которая на вход получает массив целых чисел, и в качестве результата возвращает только четные числа из этого массива. Чтобы определить четность числа, воспользуйтесь оператором для подсчета остатка от деления: x % 2. Если остаток от деления числа на 2 равен 0, число будет четное.
+<meta charset="utf-8">
+<script type="text/javascript">
+
+
+	function getRandomNumber(max){
+		var rand = Math.round(Math.random()*max)
+		return rand
+	}
+
+	function getRandomMassive(N,n){
+		var mas = []
+		for (var i = 0; i < N; i++) {
+		var randomNumber = getRandomNumber(n-1)+1;
+		mas.push(randomNumber);
+		}
+		return mas
+	}
+
+	function sum(m){
+		var sum = 0
+		for (var i = 0; i < m.length; i++){
+		sum = sum + m[i]
+		}
+		return sum
+	}
+
+
+	function max(m){
+		var max = 0
+		for (var i = 0; i < m.length; i++){
+		if (max < m[i]){
+		max = m[i];
+		}
+		}
+		return max
+	}
+
+	function min(m){
+		var min = m[0]
+		for (var i = 0; i < m.length; i++){
+		if (min > m[i]){
+		min = m[i];
+		}
+		}
+		return min
+	}
+
+
+	function mod(m) {
+		var md = []
+		for (var i = 0; i < m.length; i++) {
+		if (m[i] % 2 == 0) {
+		md.push(m[i]);
+		}
+		}
+		return md;
+	}
+
+		var m = getRandomMassive(5,4);
+			alert(m);
+		var a = sum(m);
+			alert ("Сумма равна " + a);
+		var b = max(m);
+			alert ("максимальное число = " + b);
+		var c = min(m);
+			alert ("минимальное число = " + c);
+		var md = mod(m);
+			alert("Чётные числа массива:\n" + md);
+</script>

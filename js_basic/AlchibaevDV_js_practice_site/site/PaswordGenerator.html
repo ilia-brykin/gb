@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Личный сайт студента GeekBrains</title>
+	<link rel="stylesheet" href="style.css"> 
+	<script type="text/javascript">
+		var simbols = "qwertyuiopasdfghjklzxcvbnm";
+		simbols = simbols + simbols.toUpperCase();
+		simbols = simbols + "1234567890";
+		var len = simbols.length;
+		var pass = "";
+
+		function readInt(){
+			var number = document.getElementById("userAnswer").value;
+			return parseInt(number);
+		}
+
+		function write(text){
+			document.getElementById("info").innerHTML = text;
+		}
+
+		function hide(id){
+			document.getElementById(id).style.display = "none";
+		}
+
+		function generate_password(){
+			var userAnswer = readInt();
+
+			var randomNumber = 0;
+			for(var i = 0; i < userAnswer; i++){
+				randomNumber = parseInt(Math.random() * len);
+				pass = pass + simbols[randomNumber];
+			}
+			write("Сгенерированный пароль: " + pass);
+			hide("button")
+			hide("userAnswer");
+
+		}
+
+	</script>
+
+</head>
+<body>
+
+<div class="content">
+	<div class="header">
+		<a href="index.html">Главная</a>
+		<a href="Riddles.html">Загадки</a>
+		<a href="Guess.html">Угадайка</a>
+		<a href="#">Подбор пароля</a>
+	</div>
+
+<div class="contentWrap">
+    <div class="content">
+        <div class="center">
+
+			<h1>Подбор пароля</h1>
+
+			<div class="box">
+
+				<p id = "info">Вас приветствует сервис подбора пароля! <br>Сколько символов вы хотите в своем пароле?</br></p>
+				<input type="text" id="userAnswer">
+				<br>
+				<a href="#" onClick="generate_password();" id="button">Создать пароль</a>	
+
+			</div>
+
+        </div>
+    </div>
+</div>
+
+	
+
+</div>
+<div class="footer">
+	Copyright &copy; Daniil Alchibaev
+<div>
+
+
+</body>
+</html>

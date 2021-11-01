@@ -1,0 +1,40 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title>Основы программирования. Интерактивный курс.</title>
+        <script>
+            var array = [1, 2, 3, 4, 5];
+            alert ("Генерация массива: " + ArrGen(7));
+            alert ("Cумма чисел этого массива: " + ArrSum(array));
+            alert ("Максимальное число массива: " + ArrMax(array));
+            alert ("Минимальное число массива: " + ArrMin(array));
+            alert ("Четные числа массива: " + ArrEvenNumbers(array));
+            
+            function ArrGen(n) {
+                var newArr = Array();
+                for (var i = 1; i<=n; i++) newArr.push(i);
+                return newArr;
+            }
+
+            function ArrSum(array) {
+                return array.reduce((sum, value) => sum + value);
+            }
+
+            function ArrMax(array) {
+                return Math.max(...array);
+            }
+
+            function ArrMin(array) {
+                return Math.min(...array);
+            }
+
+            function ArrEvenNumbers(array) {
+                return array.filter(value => value % 2 === 0);
+            }
+            
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
+

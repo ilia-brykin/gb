@@ -1,0 +1,74 @@
+<meta charset="utf-8">
+ <script type="text/javascript">
+ 
+ 	var conditionGame = "Поставьте мизинец левой руки на букву Ф, безымянный палец - на Ы, средний - на В, указательный - на А. Мизинец правой руки на букву Ж, безымянный палец - на Д, средний - на Л, указательный - на О. Запомните расположение пальцев.. А теперь, повторяйте за мной.";
+
+
+ 	function generateText(letters, length) {
+
+ 		var text = ""; 
+ 		for (var i = 0; i < length; i++) {
+ 			var n = getRandomNumber(letters.length - 1);
+			text = text + letters[n];
+ 		}
+
+ 		return text;
+ 	} 
+
+ 	function getRandomNumber(max) {
+ 		return Math.round(Math.random()*max);
+ 	}
+   
+   var level = [
+   ["ф","а"],
+   ["ы","в"],
+   ["о","ж"],
+   
+   ];
+
+ alert("Вас приветсвует программа по слепой печати");
+
+while(true){
+	alert("Первый уровень\n Положите 4 пальца левой руки - мезинец, безымянны, средний и уазательны - на клавишу ф, ы, в, а. Запомните, что буква А находится под вашим указательным пальцем, а ф - под мизинцем.\nТеперь неспеша набирайте текст. Постарайтесь не смотреть на клавиатуру.")
+
+ 	var text = generateText(level[0], 10);
+ 	var userText = prompt(text);
+ 	if (userText == text) {
+ 		alert("Все верно!");
+ 		break;
+ 	} else {
+ 		alert ("Вы ошиблись. Попробуйте еще раз.");  
+ 	}
+
+}
+	alert("А теперь второй уровень.");
+
+while(true) {
+	alert(conditionGame);
+
+	var text = generateText(level[1], 10);
+	var userText = prompt(text);
+	 if (userText == text) {
+	 	alert("Все верно!");
+	 	break;
+	} else {
+	 	alert ("Вы ошиблись. Попробуйте еще раз.");  
+	}
+}
+
+alert("Ура! Третий уровень.");
+
+while(true) {
+	alert(conditionGame);
+
+	var text = generateText(level[2], 10);
+	var userText = prompt(text);
+	 if (userText == text) {
+	 	alert("Все верно!");
+	 	break;
+	} else {
+	 	alert ("Вы ошиблись. Попробуйте еще раз.");  
+	}
+}
+	alert("Вы прошли все уровни игры слепой печати. Поздравляем!");
+ </script> 	

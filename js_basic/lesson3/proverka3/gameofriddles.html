@@ -1,0 +1,46 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <title>Основы программирования. Интерактивный курс.</title>
+        <script>
+            var riddles = [
+                ["Два конца, два кольца, а посредине гвоздик.", ["Ножницы", "ножницы"]],
+                ["Много рук, а нога одна.", ["Дерево", "дерево"]],
+                ["Сидит дед во сто шуб одет, кто его раздевает, тот слезы проливает.", ["Лук", "лук"]]
+            ]
+ 
+            function getAnswer(riddle) {
+                return prompt(riddle[0]);
+            }
+ 
+            function isValidAnswer(riddle, answer) {
+                for (var i = 0; i < riddle[1].length; i++) {
+                    if (riddle[1][i] == answer) return true;
+                }
+ 
+            return false;
+            }
+ 
+        alert("Отгадайте загадки.");
+ 
+        var validAnswers = 0;
+ 
+        for (var i = 0; i < riddles.length; i++) {
+        var answer = getAnswer(riddles[i]);
+ 
+        if (isValidAnswer(riddles[i], answer)) {
+            validAnswers++;
+            alert("Поздравляем, вы угадали!");
+        } else {
+            alert("Вы не угадали!");
+        }
+        }
+ 
+        alert("Правильных ответов: " + validAnswers);
+            
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
+

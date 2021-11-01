@@ -1,0 +1,53 @@
+<meta charset="utf-8" />
+<script>
+    
+function getArray(n){
+    var arr = [];
+    for(var i = 1; i <= n; i++){
+        arr.push(i);
+    }
+    return arr;
+}
+
+function summ(arr){
+    var summ = 0;
+    for(var i = 0; i < arr.length; i++){
+        summ += arr[i];
+    }
+    return summ;
+}
+
+function max(arr){
+    var max = arr[0];
+    for(var i = 1; i < arr.length; i++){
+        if(arr[i] > max)
+            max = arr[i];
+    }
+    return max;
+} 
+
+function min(arr){
+    var min = arr[0];
+    for(var i = 1; i < arr.length; i++){
+        if(arr[i] < min)
+            min = arr[i];
+}
+    return min;
+}
+
+function evenNumb(arr){
+    var evenNumb = [];
+    for(var i = 0; i < arr.length; i++){
+        if((arr[i] % 2) == 0)
+            even.push(arr[i]);
+    }
+    return evenNumb;
+}
+var n =+prompt("Введите длину массива")
+var arr = getArray(n)
+alert("Значения в массиве"+(arr));
+alert("Сумма чисел данного массива"+summ(arr));
+alert("Максимальное число данного массива"+max(arr));
+alert("Минимальное число данного массива"+min(arr));
+alert("Чётные числа данного массива"+evenNumb(arr));
+</script>

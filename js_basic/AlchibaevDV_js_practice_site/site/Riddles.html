@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Личный сайт студента GeekBrains</title>
+	<link rel="stylesheet" href="style.css"> 
+	<script type="text/javascript">
+		var score = 0;
+
+		function checkAnswer(inputId, answers){
+			var userAnswer = document.getElementById(inputId).value;
+			userAnswer = userAnswer.toLowerCase();
+			for(var i = 0; i < answers.length; i++){
+				if(userAnswer == answers[i]){
+					score++;
+					break;
+				}
+			}
+		}
+
+		
+		answer1 = ["елка", "ёлка", "елочка", "ёлочка"];
+		answer2 = ["человек"];
+		answer3 = ["магнитофон"];
+		answer4 = ["кольцо", "колечко"];
+		var Answers = [answer1, answer2, answer3, answer4];
+		
+		function checkAnswers() {
+
+			for (var i = 1; i <= Answers.length; i++){
+				checkAnswer("userAnswer" + i.toString(), Answers[i-1]);
+			}
+
+			alert("Вы отгадали " + score + " загадок");
+
+		}
+
+	</script>
+
+</head>
+<body>
+
+<div class="content">
+	<div class="header">
+		<a href="index.html">Главная</a>
+		<a href="#">Загадки</a>
+		<a href="Guess.html">Угадайка</a>
+		<a href="PaswordGenerator.html">Подбор пароля</a>
+	</div>
+
+<div class="contentWrap">
+    <div class="content">
+        <div class="center">
+
+			<h1>Игра в загадки</h1>
+
+			<div class="box">
+
+				<p>Зимой и летом одним цветом?</p>
+				<input type="text" id="userAnswer1">
+
+				<p>Утром идет на четырех ногах, днем на двух, вечером на трех. Кто это?</p>
+				<input type="text" id="userAnswer2">
+
+				<p>Музыкант, певец, рассказчик — А всего труба да ящик?</p>
+				<input type="text" id="userAnswer3">
+
+				<p>А что у меня в кармане?</p>
+				<input type="text" id="userAnswer4">
+
+				<br>
+				<a href="#" onClick="checkAnswers();">Ответить</a>
+
+			</div>
+
+        </div>
+    </div>
+</div>
+
+	
+
+</div>
+<div class="footer">
+	Copyright &copy; Daniil Alchibaev
+<div>
+
+
+</body>
+</html>
