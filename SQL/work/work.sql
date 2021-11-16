@@ -149,7 +149,6 @@ CREATE TABLE levels(
     KEY index_money(money_after_passing)
 );
 
-
 DROP TABLE IF EXISTS words;
 CREATE TABLE words(
 	id BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
